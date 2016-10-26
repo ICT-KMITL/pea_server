@@ -1,0 +1,27 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    {% block css %}
+    <link rel="stylesheet" href="//brick.a.ssl.fastly.net/Raleway:400,700">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">
+    <link rel="stylesheet" type="text/x-scss" href="{% static "scss/main.scss" %}">
+    {% endblock %}
+  </head>
+  <body>
+	<script>
+		// Note that the path doesn't matter for routing; any WebSocket
+		// connection gets bumped over to WebSocket consumers
+		socket = new WebSocket("ws://" + window.location.host + "/chat/");
+		socket.onopen = function() {
+			
+		}
+		// Call onopen directly if socket is already open
+		if (socket.readyState == WebSocket.OPEN) socket.onopen();
+	</script>
+    {% block js %}
+    <script src="{% static "js/main.js" %}"></script>
+    {% endblock %}
+  </body>
+</html>

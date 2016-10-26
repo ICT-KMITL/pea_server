@@ -1,0 +1,24 @@
+{
+  "name": "pea_server",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "axios": "0.5.x",
+    "react": "0.13.x"
+  },
+  "scripts": {
+    "build": "browserify --extension .jsx frontend/static/jsx/main.jsx | uglifyjs -cm > static/js/main.js",
+    "watch": "watchify --extension .jsx frontend/static/jsx/main.jsx -o static/js/main.js -v"
+  },
+  "devDependencies": {
+    "babelify": "6.0.x",
+    "browserify": "9.0.x",
+    "uglify-js": "2.4.x",
+    "watchify": "3.1.x"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  }
+}
