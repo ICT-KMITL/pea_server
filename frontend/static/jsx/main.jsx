@@ -20,8 +20,7 @@ var Users = React.createClass({
 		this.setState({
 			prices: prices,
 		})
-		var series = this.hchart.series[0];
-		series.addPoint([new Date(JSON.parse(e.data)[0]).getTime(), Number(JSON.parse(e.data)[1])]);
+		this.hchart.series[0].addPoint([new Date(JSON.parse(e.data)[0]).getTime(), Number(JSON.parse(e.data)[1])], true, this.hchart.series[0].data.length > 10);
 	}.bind(this);
     /*
 	axios.get('/api/users/', {
@@ -65,6 +64,25 @@ var Users = React.createClass({
   },
   componentDidMount() {
 	  var self = this;
+	  
+	  var startDay = new Date();
+	  var endDay = new Date();
+	  
+	  startDay.setHours(0);
+	  startDay.setMinutes(0);
+	  startDay.setSeconds(0);
+	  
+	  endDay.setDate(endDay.getDate() + 1);
+	  endDay.setHours(0);
+	  endDay.setMinutes(0);
+	  endDay.setSeconds(0);
+	  
+	  /*Highcharts.setOptions({
+		global: {
+			timezoneOffset: 7 * 60
+		}
+	  });*/
+	  
 	  $('#container').highcharts({
         chart: {
             type: 'spline',
@@ -74,6 +92,9 @@ var Users = React.createClass({
 				}
 			}
         },
+		credits: {
+			enabled: false
+		},
         title: {
             text: 'Real-time Prices'
         },
@@ -81,6 +102,8 @@ var Users = React.createClass({
 			type: 'datetime'
         },
         yAxis: {
+			min: 0,
+			max: 5,
             title: {
                 text: 'Price per kWh'
             },
