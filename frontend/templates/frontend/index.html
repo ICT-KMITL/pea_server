@@ -21,6 +21,7 @@
 		if (socket.readyState == WebSocket.OPEN) socket.onopen();
 	</script>
     {% block js %}
+	<script src="{% static "js/vendor.bundle.js" %}"></script>
     <script src="{% static "js/main.js" %}"></script>
     {% endblock %}
   </body>
