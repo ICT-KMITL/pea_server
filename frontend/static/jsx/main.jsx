@@ -14,14 +14,14 @@ var Users = React.createClass({
     }
   },
   componentWillMount() {
-	socket.onmessage = function(e) {
+	/*socket.onmessage = function(e) {
 		var prices = this.state.prices.slice()
 		prices.unshift(e.data)
 		this.setState({
 			prices: prices,
 		})
 		this.hchart.series[0].addPoint([new Date(JSON.parse(e.data)[0]).getTime(), Number(JSON.parse(e.data)[1])], true, this.hchart.series[0].data.length > 10);
-	}.bind(this);
+	}.bind(this);*/
     /*
 	axios.get('/api/users/', {
       xsrfCookieName: 'csrftoken',
@@ -69,7 +69,7 @@ var Users = React.createClass({
 		}
 	  });*/
 	  
-	  $('#container').highcharts({
+	  /*$('#container').highcharts({
         chart: {
             type: 'spline',
 			events: {
@@ -120,6 +120,7 @@ var Users = React.createClass({
             data: []
         }]
     });
+	*/
 	var d = new Date();
 	d.setMinutes(0);
 	d.setSeconds(0);
@@ -166,7 +167,7 @@ var Users = React.createClass({
 				</div>
 				<input className="btn btn-default" type="submit" onClick={this.broadcastPrice.bind(this)} name="submit" value="Submit"/>
 			</form>
-			<div id="container" style={{minWidth: "310px", height: "400px", margin: "0 auto"}}></div>
+			<div id="container" style={{minWidth: "310px", height: "400px", margin: "0 auto", display: "none"}}></div>
 			
 			<br/>
 			<h1>Update Flat Rate Price</h1>
