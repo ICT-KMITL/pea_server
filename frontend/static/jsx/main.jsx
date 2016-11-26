@@ -167,7 +167,6 @@ var Users = React.createClass({
 				<input className="btn btn-default" type="submit" onClick={this.broadcastPrice.bind(this)} name="submit" value="Submit"/>
 			</form>
 			<div id="container" style={{minWidth: "310px", height: "400px", margin: "0 auto"}}></div>
-			{this.state.prices.map(this.renderPrice)}
 			
 			<br/>
 			<h1>Update Flat Rate Price</h1>
