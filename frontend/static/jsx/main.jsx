@@ -190,7 +190,7 @@ var Users = React.createClass({
 						<td><input id="r1" type="number" required/></td>
 					</tr>
 					<tr>
-						<th scope="row">401+</th>
+						<th scope="row">400+</th>
 						<td><input id="r2" type="number" required/></td>
 					</tr>
 				</tbody>
