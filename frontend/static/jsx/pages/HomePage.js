@@ -9,6 +9,7 @@ import { get, put, post, defaults } from 'axios'
 @observer
 export default class HomePage extends React.Component {
 	@observable settings = {}
+	@observable households = []
 	
 	componentWillMount() {
 		var nav = $("nav");
@@ -30,6 +31,16 @@ export default class HomePage extends React.Component {
 			$('#offPeak').val(this.settings.price_tou_off_peak)
 			$('#monthly').val(this.settings.price_tou_monthly_fee)
 		})
+		
+		get('/api/households/?format=json').then((response) => {
+			this.households.replace(response.data.results)
+		})
+	}
+	
+	changeDRMode(val) {
+		var house = $("#house").val()
+		socket.send(JSON.stringify({type: "dr", id: house, value: val}));
+		alert("DR Command Sended")
 	}
 
 	broadcastPrice(e) {
@@ -88,8 +99,32 @@ export default class HomePage extends React.Component {
 		
 		return (
 			<div className="container">
+				<h1>Change DR Mode</h1>
+				<br/>
+				<form className="form-inline">
+					<div className="form-group">
+						<label>House</label>
+						&nbsp;
+						<select className="form-control" name="house" id="house">
+							{
+							  this.households.filter((house) => {return house.dr_allowed}).map((house) => {
+								return (
+									<option key={house.id} value={house.id}>{house.name} (id={house.id})</option>
+								)
+							  })
+							}
+						</select>
+					</div>
+					&nbsp;
+					<div onClick={this.changeDRMode.bind(this, "1")} className="btn btn-primary">Enable</div>
+					&nbsp;
+					<div onClick={this.changeDRMode.bind(this, "0")} className="btn btn-success">Disable</div>
+				</form>
+				<br/>
+				
 				<h1>Broadcast Realtime Price</h1>
 				<br/>
+				
 				<form className="form-inline">
 					<div className="form-group">
 						<label htmlFor="date">Date</label>&nbsp;
@@ -100,9 +135,9 @@ export default class HomePage extends React.Component {
 						<label htmlFor="new_price">New price</label>&nbsp;
 						<input className="form-control" type="number" defaultValue="1.5" id="new_price" name="new_price" placeholder="New Price"/>
 					</div>
+					&nbsp;
 					<input className="btn btn-default" type="submit" onClick={this.broadcastPrice.bind(this)} name="submit" value="Submit"/>
 				</form>
-				<div id="container" style={{minWidth: "310px", height: "400px", margin: "0 auto", display: "none"}}></div>
 				
 				<br/>
 				<h1>Update Flat Rate Price</h1>

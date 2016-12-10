@@ -14,6 +14,7 @@ class Household(models.Model):
     appliances = JSONField(default={})
     usage = JSONField(default={})
     mode = models.TextField(default="")
+    dr_allowed = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
     
     class Meta:
