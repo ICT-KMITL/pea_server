@@ -92,7 +92,8 @@ WSGI_APPLICATION = 'pea_server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': 'db',
+        #'HOST': 'db',
+		'HOST': os.getenv("DB_1_PORT_5432_TCP_ADDR"),
         'NAME': 'pea_server',
         'USER': 'pea_server',
         'PASSWORD': 'ictadmin',
