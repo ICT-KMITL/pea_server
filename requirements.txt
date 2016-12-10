@@ -1,2 +1,4 @@
 django
 channels
+psycopg2
+djangorestframework

@@ -1,9 +1,9 @@
-#db:
-#  image: postgres:latest
-#  environment:
-#    POSTGRES_USER: test_ddr
-#    POSTGRES_PASSWORD:
-#  env_file: dev.env
+db:
+  image: postgres:latest
+  environment:
+    POSTGRES_USER: pea_server
+    POSTGRES_PASSWORD: ictadmin
+  env_file: dev.env
 
 web:
   stdin_open: true
@@ -11,8 +11,8 @@ web:
   build: .
   volumes:
     - .:/usr/src/app
-#  links:
-#    - db:db
+  links:
+    - db:db
   environment:
     - PYTHONUNBUFFERED=1
     - ENV=DEV

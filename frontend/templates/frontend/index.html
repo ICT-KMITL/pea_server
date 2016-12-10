@@ -20,9 +20,12 @@
 		// Call onopen directly if socket is already open
 		if (socket.readyState == WebSocket.OPEN) socket.onopen();
 	</script>
+	<div id="body">
+	</div>
     {% block js %}
 	<script src="{% static "js/vendor.bundle.js" %}"></script>
     <script src="{% static "js/main.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/bootstrap-tweaks.css" %}"/>
     {% endblock %}
   </body>
 </html>

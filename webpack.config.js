@@ -7,7 +7,7 @@ module.exports = {
   devtool: debug ? "inline-sourcemap" : "cheap-module-source-map",
   entry: {
 	  vendor: ['babel-polyfill', "axios", "react"],
-	  app: ["./frontend/static/jsx/main.jsx"],
+	  app: ["./frontend/static/jsx/main.js"],
 	  //html: "./index.html"
   },
   module: {
@@ -18,7 +18,7 @@ module.exports = {
 		  loader: "file?name=[name].[ext]"
 	  },
       {
-        test: /\.jsx$/,
+        test: /\.js$/,
         //loader: 'babel-loader'
 		exclude: /(node_modules|bower_components)/,
 		loader: 'babel'
@@ -66,7 +66,7 @@ module.exports = {
     }),
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
+    //new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
   ],
   devServer: {
     historyApiFallback: true
