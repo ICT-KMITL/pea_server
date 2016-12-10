@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from datetime import datetime
 
 # Create your models here.
 
@@ -13,6 +14,6 @@ class Household(models.Model):
     appliances = JSONField(default={})
     usage = JSONField(default={})
     mode = models.TextField(default="")
-    last_update = models.DateTimeField(auto_now=True)
+    last_update = models.DateTimeField(default=datetime.now)
 
     
