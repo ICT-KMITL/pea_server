@@ -2,3 +2,4 @@ django
 channels
 psycopg2
 djangorestframework
+django-cors-headers
