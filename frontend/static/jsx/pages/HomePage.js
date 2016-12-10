@@ -39,8 +39,10 @@ export default class HomePage extends React.Component {
 	
 	changeDRMode(val) {
 		var house = $("#house").val()
-		socket.send(JSON.stringify({type: "dr", id: house, value: val}));
-		alert("DR Command Sended")
+		if(house) {
+			socket.send(JSON.stringify({type: "dr", id: house, value: val}));
+			alert("DR Command Sended")
+		}
 	}
 
 	broadcastPrice(e) {
