@@ -14,9 +14,17 @@ class Household(models.Model):
     appliances = JSONField(default={})
     usage = JSONField(default={})
     mode = models.TextField(default="")
-    last_update = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(auto_now=True)
     
     class Meta:
         ordering = ('id',)
 
+class News(models.Model):
+    title = models.CharField(max_length=100, blank=False)
+    description = models.TextField(default="")
+    mode = models.TextField(default="")
+    last_updated = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        ordering = ('id',)
+

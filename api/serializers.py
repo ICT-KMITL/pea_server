@@ -26,15 +26,22 @@ class SettingKVSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('name', 'value')
 
 class HouseholdListSerializer(serializers.HyperlinkedModelSerializer):
-    last_update = DateTimeFieldWihTZ(format='%d %b %Y %I:%M %p', read_only=True)
+    last_updated = DateTimeFieldWihTZ(format='%d %b %Y %I:%M %p', read_only=True)
     
     class Meta:
         model = Household
-        fields = ('url', 'id', 'name', 'package', 'mode', 'last_update')
+        fields = ('url', 'id', 'name', 'package', 'mode', 'last_updated')
 
 class HouseholdSerializer(serializers.HyperlinkedModelSerializer):
-    last_update = DateTimeFieldWihTZ(format='%d %b %Y %I:%M %p', read_only=True)
+    last_updated = DateTimeFieldWihTZ(format='%d %b %Y %I:%M %p', read_only=True)
     
     class Meta:
         model = Household
-        fields = ('url', 'id', 'name', 'package', 'mode', 'usage', 'appliances', 'last_update')
+        fields = ('url', 'id', 'name', 'package', 'mode', 'usage', 'appliances', 'last_updated')
+
+class NewsSerializer(serializers.HyperlinkedModelSerializer):
+    last_updated = DateTimeFieldWihTZ(format='%d %b %Y %I:%M %p', read_only=True)
+    
+    class Meta:
+        model = News
+        fields = ('url', 'id', 'title', 'description', 'last_updated')
