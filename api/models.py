@@ -9,10 +9,10 @@ class Setting(models.Model):
 	
 class Household(models.Model):
     name = models.TextField()
-    package = models.TextField()
-    appliances = JSONField()
-    usage = JSONField()
-    mode = models.TextField()
-    last_update = models.DateTimeField()
+    package = models.TextField(default="")
+    appliances = JSONField(default={})
+    usage = JSONField(default={})
+    mode = models.TextField(default="")
+    last_update = models.DateTimeField(auto_now=True)
 
     
