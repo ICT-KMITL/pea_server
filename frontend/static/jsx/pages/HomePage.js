@@ -118,9 +118,11 @@ export default class HomePage extends React.Component {
 						</select>
 					</div>
 					&nbsp;
-					<div onClick={this.changeDRMode.bind(this, "1")} className="btn btn-primary">Enable</div>
+					<div onClick={this.changeDRMode.bind(this, "2")} className="btn btn-danger">Extreme Saving</div>
 					&nbsp;
-					<div onClick={this.changeDRMode.bind(this, "0")} className="btn btn-success">Disable</div>
+					<div onClick={this.changeDRMode.bind(this, "1")} className="btn btn-warning">Saving</div>
+					&nbsp;
+					<div onClick={this.changeDRMode.bind(this, "0")} className="btn btn-success">Normal</div>
 				</form>
 				<br/>
 				
