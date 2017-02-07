@@ -1,11 +1,11 @@
 from django.http import HttpResponse
 from channels.handler import AsgiHandler
 from channels import Group
+import json
 
 def ws_add(message):
     message.reply_channel.send({
-        'type': 'handshake',
-        'accept': True
+        'text': json.dumps({'type': 'handshake'})
     })
     Group("users").add(message.reply_channel)
 
