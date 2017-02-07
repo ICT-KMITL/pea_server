@@ -3,6 +3,10 @@ from channels.handler import AsgiHandler
 from channels import Group
 
 def ws_add(message):
+    message.reply_channel.send({
+        'type': 'handshake',
+        'accept': True
+    }
     Group("users").add(message.reply_channel)
 
 def ws_message(message):
