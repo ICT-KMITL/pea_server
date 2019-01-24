@@ -37,7 +37,7 @@ class HouseholdSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Household
-        fields = ('url', 'id', 'name', 'package', 'mode', 'dr_allowed', 'usage', 'appliances', 'rules', 'appliances_info', 'last_updated')
+        fields = ('url', 'id', 'name', 'package', 'mode', 'dr_allowed', 'usage', 'appliances', 'rules', 'event_info', 'appliances_info', 'last_updated')
 
 class NewsSerializer(serializers.HyperlinkedModelSerializer):
     last_updated = DateTimeFieldWihTZ(format='%d %b %Y %I:%M %p', read_only=True)
@@ -45,3 +45,10 @@ class NewsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = News
         fields = ('url', 'id', 'title', 'description', 'last_updated')
+
+class FirmwareSerializer(serializers.HyperlinkedModelSerializer):
+    last_updated = DateTimeFieldWihTZ(format='%d %b %Y %I:%M %p', read_only=True)
+    
+    class Meta:
+        model = News
+        fields = ('url', 'id', 'title', 'version', 'description', 'last_updated')

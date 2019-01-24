@@ -20,6 +20,7 @@ from rest_framework import generics
 def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
+		'firmware': reverse('firmware-list', request=request, format=format),
 		'news': reverse('news-list', request=request, format=format),
 		'households': reverse('household-list', request=request, format=format),
 		'settings': reverse('setting-list', request=request, format=format),
@@ -87,6 +88,29 @@ class NewsList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericA
 class NewsDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+class FirmwareList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+    queryset = Firmware.objects.all()
+    serializer_class = FirmwareSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
+class FirmwareDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = Firmware.objects.all()
+    serializer_class = FirmwareSerializer
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)

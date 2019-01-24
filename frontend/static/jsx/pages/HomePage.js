@@ -206,6 +206,8 @@ export default class HomePage extends React.Component {
 	}
 	
 	updateFlatRate(event) {
+	    console.log("after click update");
+		console.log($("#r0").val());
 		event.preventDefault()
 
 		socket.send(JSON.stringify({type: "flatRate", r1: $("#r0").val(), r2:$("#r1").val(), r3:$("#r2").val()}));
@@ -333,15 +335,15 @@ export default class HomePage extends React.Component {
 					<tbody>
 						<tr>
 							<th scope="row">0-150</th>
-							<td><input id="r0" type="number" required/></td>
+							<td><input id="r0" type="number" step=0.0001 required/></td>
 						</tr>
 						<tr>
 							<th scope="row">151-400</th>
-							<td><input id="r1" type="number" required/></td>
+							<td><input id="r1" type="number" step=0.0001 required/></td>
 						</tr>
 						<tr>
 							<th scope="row">400+</th>
-							<td><input id="r2" type="number" required/></td>
+							<td><input id="r2" type="number" step=0.0001 required/></td>
 						</tr>
 					</tbody>
 				</table>
@@ -365,9 +367,9 @@ export default class HomePage extends React.Component {
 					</thead>
 					<tbody>
 						<tr>
-							<td><input id="peak" type="number" required/></td>
-							<td><input id="offPeak" type="number" required/></td>
-							<td><input id="monthly" type="number" required/></td>
+							<td><input id="peak" type="number" step=0.0001 required/></td>
+							<td><input id="offPeak" type="number" step=0.0001 required/></td>
+							<td><input id="monthly" type="number" step=0.001 required/></td>
 						</tr>
 					</tbody>
 				</table>
