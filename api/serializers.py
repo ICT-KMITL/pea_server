@@ -50,5 +50,5 @@ class FirmwareSerializer(serializers.HyperlinkedModelSerializer):
     last_updated = DateTimeFieldWihTZ(format='%d %b %Y %I:%M %p', read_only=True)
     
     class Meta:
-        model = News
+        model = Firmware
         fields = ('url', 'id', 'title', 'version', 'description', 'last_updated')

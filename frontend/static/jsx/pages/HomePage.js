@@ -2,6 +2,7 @@ import React from "react"
 import { observer } from "mobx-react"
 import { computed, observable, action, autorun } from "mobx"
 import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import moment from 'moment'
 
 import { get, put, post, defaults } from 'axios'
@@ -204,6 +205,30 @@ export default class HomePage extends React.Component {
 			document.getElementById("date").value = d.toISOString().slice(0, 19);
 		}
 	}
+
+	updateFlatRate1(event) {
+	    console.log("after click update");
+		console.log($("#r0").val());
+		event.preventDefault()
+
+		socket.send(JSON.stringify({type: "flatRate", r1: $("#rr0").val(), r2:$("#rr1").val(), r3:$("#rr2").val()
+                                           , r4: $("#rr3").val(), r5:$("#rr4").val(), r6:$("#rr5").val(), r7:$("#rr6").val()}));
+		
+		var update = {}
+		update['price_flat_0_to_15'] = $("#rr0").val()
+		update['price_flat_16_to_25'] = $("#rr1").val()
+		update['price_flat_26_to_35'] = $("#rr2").val()
+		update['price_flat_36_to_100'] = $("#rr3").val()
+		update['price_flat_101_to_150'] = $("#rr4").val()
+		update['price_flat_151_to_400'] = $("#rr5").val()
+		update['price_flat_400_up'] = $("#rr6").val()
+		
+		put('/api/settingsKV/?format=json', update).then((response) => {
+			alert('Update Flat Rate Successful')
+		}).catch((error) => {
+			console.log(error)
+		})
+	}
 	
 	updateFlatRate(event) {
 	    console.log("after click update");
@@ -324,6 +349,57 @@ export default class HomePage extends React.Component {
 				<br/>
 				<h1>Update Flat Rate Price</h1>
 				<br/>
+                                <Tabs>
+                                    <TabList>
+                                        <Tab>Home User 1.1.1</Tab>
+                                        <Tab>Home User 1.1.2</Tab>
+                                    </TabList>
+
+                                <TabPanel>
+				<form onSubmit={this.updateFlatRate1}>
+				<table className="table table-bordered">
+					<thead>
+						<tr>
+							<th>Unit</th>
+							<th>Price</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">0-15</th>
+							<td><input id="rr0" type="number" step="any" required/></td>
+						</tr>
+						<tr>
+							<th scope="row">16-25</th>
+							<td><input id="rr1" type="number" step="any" required/></td>
+						</tr>
+						<tr>
+							<th scope="row">26-35</th>
+							<td><input id="rr2" type="number" step="any" required/></td>
+						</tr>
+						<tr>
+							<th scope="row">36-100</th>
+							<td><input id="rr3" type="number" step="any" required/></td>
+						</tr>
+						<tr>
+							<th scope="row">101-150</th>
+							<td><input id="rr4" type="number" step="any" required/></td>
+						</tr>
+						<tr>
+							<th scope="row">151-400</th>
+							<td><input id="rr5" type="number" step="any" required/></td>
+						</tr>
+						<tr>
+							<th scope="row">400+</th>
+							<td><input id="rr6" type="number" step="any" required/></td>
+						</tr>
+					</tbody>
+				</table>
+				<input className="btn btn-default" type="submit" name="submit" value="Update"/>
+				</form>
+                                </TabPanel>
+
+                                <TabPanel>
 				<form onSubmit={this.updateFlatRate}>
 				<table className="table table-bordered">
 					<thead>
@@ -335,20 +411,22 @@ export default class HomePage extends React.Component {
 					<tbody>
 						<tr>
 							<th scope="row">0-150</th>
-							<td><input id="r0" type="number" step=0.0001 required/></td>
+							<td><input id="r0" type="number" step="any" required/></td>
 						</tr>
 						<tr>
 							<th scope="row">151-400</th>
-							<td><input id="r1" type="number" step=0.0001 required/></td>
+							<td><input id="r1" type="number" step="any" required/></td>
 						</tr>
 						<tr>
 							<th scope="row">400+</th>
-							<td><input id="r2" type="number" step=0.0001 required/></td>
+							<td><input id="r2" type="number" step="any" required/></td>
 						</tr>
 					</tbody>
 				</table>
 				<input className="btn btn-default" type="submit" name="submit" value="Update"/>
 				</form>
+                                </TabPanel>
+                                </Tabs>
 				
 				<br/>
 				<h1>Update TOU Price</h1>
@@ -367,9 +445,9 @@ export default class HomePage extends React.Component {
 					</thead>
 					<tbody>
 						<tr>
-							<td><input id="peak" type="number" step=0.0001 required/></td>
-							<td><input id="offPeak" type="number" step=0.0001 required/></td>
-							<td><input id="monthly" type="number" step=0.001 required/></td>
+							<td><input id="peak" type="number" step="any" required/></td>
+							<td><input id="offPeak" type="number" step="any" required/></td>
+							<td><input id="monthly" type="number" step="any" required/></td>
 						</tr>
 					</tbody>
 				</table>
