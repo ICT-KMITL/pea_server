@@ -17,6 +17,7 @@ class Household(models.Model):
     dr_allowed = models.BooleanField(default=False)
     rules = JSONField(default={})
     appliances_info = JSONField(default={})
+    event_info = JSONField(default={})
     last_updated = models.DateTimeField(auto_now=True)
     
     class Meta:
@@ -31,3 +32,11 @@ class News(models.Model):
     class Meta:
         ordering = ('id',)
 
+class Firmware(models.Model):
+    title = models.CharField(max_length=100, blank=False)
+    version = models.CharField(max_length=100, blank=False)
+    description = models.TextField(default="")
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ('id',)
