@@ -97,7 +97,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         #'HOST': 'db',
-		'HOST': "localhost", #os.getenv("DB_1_PORT_5432_TCP_ADDR"),
+		'HOST': os.getenv("DB_1_PORT_5432_TCP_ADDR"), # "localhost", #
         'NAME': 'pea_server',
         'USER': 'pea_server',
         'PASSWORD': 'ictadmin',
