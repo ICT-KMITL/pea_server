@@ -1,4 +1,3 @@
-from channels.routing import route
 from frontend.consumers import ChatConsumer
 from django.conf.urls import url
 
