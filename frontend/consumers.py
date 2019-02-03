@@ -13,8 +13,14 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data=None, bytes_data=None):
         async_to_sync(self.channel_layer.group_send)(
             "users",
-            text_data
+            {
+                "type": 'message',
+                "text": text_data,
+            }
         )
+    
+    def message(self, event):
+        self.send(text_data=event["text"])
         
     def disconnect(self, close_code):
         pass
