@@ -1,23 +1,26 @@
 from django.http import HttpResponse
-from channels.handler import AsgiHandler
-from channels import Group
 import json
+from channels.generic.websocket import WebsocketConsumer
+from asgiref.sync import async_to_sync
 
-def ws_add(message):
-    message.reply_channel.send({
-        'text': json.dumps({'type': 'handshake'})
-    })
-    Group("users").add(message.reply_channel)
+class ChatConsumer(WebsocketConsumer):
+    groups = ["users"]
 
-def ws_message(message):
-    # ASGI WebSocket packet-received and send-packet message types
-    # both have a "text" key for their textual data.
-    #message.reply_channel.send({
-    #    "text": message.content['text'],
-    #})
-    Group("users").send({
-         "text": message.content['text'],
-    })
-
-def ws_disconnect(message):
-    Group("users").discard(message.reply_channel)
+    def connect(self):
+        self.accept()
+        self.send(text_data=json.dumps({'type': 'handshake'}))
+        
+    def receive(self, text_data=None, bytes_data=None):
+        async_to_sync(self.channel_layer.group_send)(
+            "users",
+            {
+                "type": 'message',
+                "text": text_data,
+            }
+        )
+    
+    def message(self, event):
+        self.send(text_data=event["text"])
+        
+    def disconnect(self, close_code):
+        pass

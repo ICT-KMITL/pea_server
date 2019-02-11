@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	
 	'rest_framework',
-#	'channels',
+	'channels',
 	'corsheaders',
 	
 	'api',
@@ -88,6 +88,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'pea_server.wsgi.application'
+ASGI_APPLICATION = 'pea_server.routing.application'
 
 
 # Database
@@ -149,10 +150,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'www', 'static')
 
 
-#CHANNEL_LAYERS = {
-#    "default": {
-#        "BACKEND": "asgiref.inmemory.ChannelLayer",
-#        "ROUTING": "frontend.routing.channel_routing",
-#    },
-#}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
