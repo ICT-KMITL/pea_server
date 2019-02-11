@@ -1,5 +1,6 @@
-django
-channels
+channels==2.1.7
 psycopg2
 djangorestframework
 django-cors-headers
+msgpack-python
+django==1.11
