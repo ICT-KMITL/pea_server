@@ -43,6 +43,7 @@
 					<li><a href="/">Home</a></li>
 					<li class="{% if 'household-' in request.resolver_match.url_name %}active{% endif %}"><a href="/api/households/">Households</a></li>
 					<li class="{% if 'news-' in request.resolver_match.url_name %}active{% endif %}"><a href="/api/news/">News</a></li>
+					<li class="{% if 'firmware-' in request.resolver_match.url_name %}active{% endif %}"><a href="/api/firmware/">Firmware Version</a></li>
                 </ul>
                 <!--<ul class="nav navbar-nav pull-right">
                   {% block userlinks %}

@@ -66,9 +66,24 @@ class RuleCard extends React.Component {
 	}
 	
 	renderAction(action, i) {
-		return (
-			<li key={i}>Execute <b>{action.cmd_name}</b> on <b>{this.props.rulespage.getAppliance(action.app_id) ? this.props.rulespage.getAppliance(action.app_id).name : "-"}</b> to {action.parameters.setTo}</li>
-		)
+		if (action.app_id == "action"){
+			return ( 
+				<li key={i}><b>{action.cmd_name}</b> This Rule</li>
+			)
+		} else if (action.app_id == "waiting"){
+			var waitTime = action.parameters.setTo.split(':',2)
+			return ( 
+				<li key={i}>Wait for <b>{parseInt(waitTime[0])}</b> hour(s) <b>{parseInt(waitTime[1])}</b> minute(s)</li>
+			)
+		} else if (action.app_id == "alarm"){
+			return ( 
+				<li key={i}>Send Alarm Message <b>{action.parameters.setTo}</b></li>
+			) 
+		} else {
+			return (
+				<li key={i}>Execute <b>{action.cmd_name}</b> on <b>{this.props.rulespage.getAppliance(action.app_id) ? this.props.rulespage.getAppliance(action.app_id).name : "-"}</b> to {action.parameters.setTo}</li>
+			)
+		}
 	}
 	
 	deleteRule() {
@@ -99,6 +114,74 @@ class RuleCard extends React.Component {
 			)
 		}
 	}
+
+	activeRule() {
+                var data = {params: { format: 'json', active: 1	}}
+		if(confirm("Are you sure you want to active this rule?")) {
+                        socket.send(JSON.stringify({type: "post", id: this.house, url: '/api/rules/'+this.props.rule.id+'/active/'}));
+
+			var newData = []
+			
+			this.houseData.rules.forEach((rule) => {
+				if(rule.id != this.props.rule.id) {
+					newData.push(rule)
+				} else {
+                                        rule.active = 1
+					newData.push(rule)
+                                }
+			})
+
+			this.houseData.rules = newData
+
+			put('/api/households/'+this.house+'/?format=json', this.houseData)
+			.then(action("Update Rule Fulfilled", (res) => {
+				this.edit = false
+				$("#addRuleModal").modal("hide")
+				this.clearRuleForm()
+				//this.fetchRules()
+				this.changeHouse()
+			  })
+			).catch(action("Update Rule Rejected", (err) => {
+				
+			  })
+			)
+
+		}
+	}
+
+	deactiveRule() {
+                var data = {params: { format: 'json', active: 0	}}
+		if(confirm("Are you sure you want to de-active this rule?")) {
+                        socket.send(JSON.stringify({type: "post", id: this.house, url: '/api/rules/'+this.props.rule.id+'/active/'}));
+
+			var newData = []
+			
+			this.houseData.rules.forEach((rule) => {
+				if(rule.id != this.props.rule.id) {
+					newData.push(rule)
+				} else {
+                                        rule.active = 0
+					newData.push(rule)
+                                }
+			})
+
+			this.houseData.rules = newData
+
+			put('/api/households/'+this.house+'/?format=json', this.houseData)
+			.then(action("Update Rule Fulfilled", (res) => {
+				this.edit = false
+				$("#addRuleModal").modal("hide")
+				this.clearRuleForm()
+				//this.fetchRules()
+				this.changeHouse()
+			  })
+			).catch(action("Update Rule Rejected", (err) => {
+				
+			  })
+			)
+
+		}
+	}
 	
 	editRule() {
 		this.props.rulespage.addAction.replace(this.props.rule.action)
@@ -113,24 +196,37 @@ class RuleCard extends React.Component {
 				<div className="content" style={{padding: "15px"}}>
 					<div className="media">
 						<div className="media-body">
-							<h3>Do</h3>
-							<ul>
-								{this.props.rule.action.map((action, i) => {
-									return this.renderAction(action, i)
-								})}
-							</ul>
+							<li style={{float: "right"}}><b>{"Owner: "+this.props.rule.owner}</b></li>
 							<h3>If</h3>
 							<ul>
 								{this.props.rule.conditions.map((condition, i) => {
 									return this.renderCondition(condition, i)
 								})}
 							</ul>
+							<h3>Do</h3>
+							<ul>
+								{this.props.rule.action.map((action, i) => {
+									return this.renderAction(action, i)
+								})}
+							</ul>
+
 						</div>
 						
 						<div className="media-left" style={{display: "inline-block"}}>
-							<a className="btn btn-warning" data-toggle="modal" data-target="#addRuleModal" onClick={this.editRule.bind(this)}>Edit</a>
+                                                        <hr	style={{
+								color: "#000000",
+								backgroundColor: "#000000",
+								height: 1
+							}} />
+							<a className="btn btn-warning btn-sm" data-toggle="modal" data-target="#addRuleModal" onClick={this.editRule.bind(this)}>Edit</a>
 							&nbsp;
-							<a className="btn btn-danger" onClick={this.deleteRule.bind(this)}>Delete</a>
+							<a className="btn btn-danger btn-sm" onClick={this.deleteRule.bind(this)}>Delete</a>
+							&nbsp;
+							{ 
+								(this.props.rule.active == 0) ? 
+								<a className="btn btn-info btn-sm" onClick={this.activeRule.bind(this)}>Active</a> :
+								<a className="btn btn-primary btn-sm" onClick={this.deactiveRule.bind(this)}>Deactive</a>
+							}
 						</div>
 					</div>
 				</div>
@@ -477,7 +573,8 @@ export default class HomePage extends React.Component {
 				</form>
 				
 				<h3>
-					Rules {this.ruleHouseSelected ? <button type="button" className="btn btn-success" data-toggle="modal" data-target="#addRuleModal" onClick={() => {this.clearRuleForm();this.edit=false;}}>Add</button> : null}
+					Rules {this.ruleHouseSelected ? <button type="button" className="btn btn-success" data-toggle="modal" data-target="#addRuleModal" onClick={() => {this.clearRuleForm();this.edit=false;}}>Add</button>
+                                                                      : null}
 					
 					<div className="modal fade" id="addRuleModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
 					  <div className="modal-dialog" role="document">
@@ -487,13 +584,6 @@ export default class HomePage extends React.Component {
 							<h4 className="modal-title" id="myModalLabel">Add Rule</h4>
 						  </div>
 						  <div className="modal-body" style={{fontSize: "20px"}}>
-							<h3>Do</h3>
-							<ul>
-								{this.addAction.map((obj, i) => {
-									return this.renderAction(obj, i)
-								})}
-							</ul>
-							<button type="button" className="btn btn-success" data-toggle="modal" data-target="#addDoModal">Add</button>
 							<h3>If</h3>
 							<ul>
 								{this.addCondition.map((obj, i) => {
@@ -501,6 +591,13 @@ export default class HomePage extends React.Component {
 								})}
 							</ul>
 							<button type="button" className="btn btn-success" data-toggle="modal" data-target="#addConditionModal">Add</button>
+							<h3>Do</h3>
+							<ul>
+								{this.addAction.map((obj, i) => {
+									return this.renderAction(obj, i)
+								})}
+							</ul>
+							<button type="button" className="btn btn-success" data-toggle="modal" data-target="#addDoModal">Add</button>
 						  </div>
 						  <div className="modal-footer">
 							<button type="button" className="btn btn-default" onClick={this.clearRuleForm.bind(this)}  data-dismiss="modal">Cancel</button>
@@ -840,6 +937,7 @@ export default class HomePage extends React.Component {
 				  })
 				)
 			} else {
+                                data = {action: this.addAction, conditions: this.addCondition, owner: "pea", active: 0}
 				socket.send(JSON.stringify({type: "post", id: this.house, url: '/api/rules/', data: data}));
 				
 				data["id"] = Math.floor((Math.random() * 1000000000) + 100000000);
