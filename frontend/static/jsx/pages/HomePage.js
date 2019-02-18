@@ -61,6 +61,10 @@ class RuleCard extends React.Component {
 			return (
 				<li key={i}><b>DR Mode</b> is <b>{condition.value == 0 ? "Normal" : (condition.value == 1 ? "Savings" : "Extreme Savings")}</b></li>
 			)
+		} else if(condition.type == "pricing") {
+			return (
+				<li key={i}>Pricing {this.renderOperator(condition.operator)} {condition.value}</li>
+			)
 		}  else {
 			return null
 		}
@@ -846,11 +850,15 @@ export default class HomePage extends React.Component {
 									<option value="time">Time</option>
 									<option value="mode">Mode</option>
 									<option value="drmode">DR Mode</option>
+									<option value="pricing">Pricing</option>
 								</select>
 							</div>
 							<div className="form-group condition conditionTime">
 								<label>Start Time</label>
 								<input type="time" className="form-control" id="conditionStartTime"/>
+							</div>
+							<div className="form-group condition conditionPricing">
+								<label>Pricing</label>
 							</div>
 							<div className="form-group condition conditionTime">
 								<label>End Time</label>
@@ -885,7 +893,7 @@ export default class HomePage extends React.Component {
 									): null}
 								</select>
 							</div>
-							<div className="form-group condition conditionApp conditionSensor">
+							<div className="form-group condition conditionPricing conditionApp conditionSensor">
 								<label>Operator</label>
 								<select className="form-control" id="conditionOperator">
 									<option disabled selected value> -- select an option -- </option>
@@ -897,7 +905,7 @@ export default class HomePage extends React.Component {
 									<option value="le">&lt;=</option>
 								</select>
 							</div>
-							<div className="form-group condition conditionApp conditionSensor">
+							<div className="form-group condition conditionPricing conditionApp conditionSensor">
 								<label>Value</label>
 								<input type="text" className="form-control" id="conditionValue" placeholder="Value"/>
 							</div>
@@ -955,6 +963,9 @@ export default class HomePage extends React.Component {
 		}
 		else if($("#conditionType").val() == "drmode") {
 			$(".conditionDRmode").show()
+		}
+		else if($("#conditionType").val() == "pricing") {
+			$(".conditionPricing").show()
 		}
 	}
 	
@@ -1019,6 +1030,18 @@ export default class HomePage extends React.Component {
 			} else {
 				alert("Please fill in all fields")
 			}
+		} else if(type == "pricing") {
+			var operator = $("#conditionOperator").val()
+			var value = $("#conditionValue").val()
+			
+			if(operator && value) {
+				this.addCondition.push({type: type, operator: operator, value: value})
+				$("#addConditionModal").modal("hide")
+				this.clearForm()
+			} else {
+				alert("Please fill in all fields")
+			}
+
 		} else if(type == "sensor") {
 			
 		} else if(type == "time") {
@@ -1195,6 +1218,10 @@ export default class HomePage extends React.Component {
 		} else if(condition.type == "drmode") {
 			return (
 				<li style={{height: "25px"}} key={i}><b>DR Mode</b> is <b>{condition.value == 0 ? "Normal" : (condition.value == 1 ? "Savings" : "Extreme Savings")}</b> <button type="button" className="close" style={{color: "black", marginTop: "3px"}}><span onClick={this.removeAddCondition.bind(this, i)}>&times;</span></button></li>
+			)
+		} else if(condition.type == "pricing") {
+			return (
+				<li style={{height: "25px"}} key={i}>Pricing {this.renderOperator(condition.operator)} {condition.value} <button type="button" className="close" style={{color: "black", marginTop: "3px"}}><span onClick={this.removeAddCondition.bind(this, i)}>&times;</span></button></li>
 			)
 		} else {
 			return null
