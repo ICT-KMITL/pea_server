@@ -3,6 +3,7 @@ import { observer } from "mobx-react"
 import { computed, observable, action, autorun } from "mobx"
 import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
+import DatePicker from "react-datepicker";
 import moment from 'moment'
 
 import { get, put, post, defaults } from 'axios'
@@ -59,6 +60,10 @@ class RuleCard extends React.Component {
 		} else if(condition.type == "drmode") {
 			return (
 				<li key={i}><b>DR Mode</b> is <b>{condition.value == 0 ? "Normal" : (condition.value == 1 ? "Savings" : "Extreme Savings")}</b></li>
+			)
+		} else if(condition.type == "pricing") {
+			return (
+				<li key={i}>Pricing {this.renderOperator(condition.operator)} {condition.value}</li>
 			)
 		}  else {
 			return null
@@ -266,6 +271,13 @@ export default class HomePage extends React.Component {
 		get('/api/settingsKV/?format=json').then((response) => {
 			this.settings = response.data
 			console.log(this.settings)
+			$('#rr0').val(this.settings.price_flat_0_to_15)
+			$('#rr1').val(this.settings.price_flat_16_to_25)
+			$('#rr2').val(this.settings.price_flat_26_to_35)
+			$('#rr3').val(this.settings.price_flat_36_to_100)
+			$('#rr4').val(this.settings.price_flat_101_to_150)
+			$('#rr5').val(this.settings.price_flat_151_to_400)
+			$('#rr6').val(this.settings.price_flat_400_up)
 			$('#r0').val(this.settings.price_flat_0_to_150)
 			$('#r1').val(this.settings.price_flat_151_to_400)
 			$('#r2').val(this.settings.price_flat_400_up)
@@ -287,27 +299,48 @@ export default class HomePage extends React.Component {
 		}
 	}
 
+	broadcastFV(e) {
+		e.preventDefault();
+		if(document.getElementById("FT_Value").value != "") {
+			var pr = {FT: $("#FT_Value").val() , VAT: $("#VAT_Value").val()}
+			console.log("data");
+			console.log(pr);
+			socket.send(JSON.stringify({type: "FTnVAT", price: pr}))
+		}
+	}
+
 	broadcastPrice(e) {
 		e.preventDefault();
-		if(document.getElementById("new_price").value != "") {
-			socket.send(JSON.stringify({type: "realtime", date: document.getElementById("date").value, price: document.getElementById("new_price").value}));
+		if(document.getElementById("rtp23").value != "") {
+			var item = [ "rtp0",  "rtp1",  "rtp2",  "rtp3",  "rtp4",  "rtp5",  "rtp6",  "rtp7",  "rtp8",  "rtp9",
+						"rtp10", "rtp11", "rtp12", "rtp13", "rtp14", "rtp15", "rtp16", "rtp17", "rtp18", "rtp19",
+						"rtp20", "rtp21", "rtp22", "rtp23"]
+                        console.log("data");
+			console.log(item);
+			var pr = {rtpF: $("#rtpF").val()};
+			item.map((i) => {	console.log("data");
+								console.log(i);
+								pr[i] = $("#"+i).val()});
+			console.log("data");
+			console.log(pr);
+			socket.send(JSON.stringify({type: "realtime", date: document.getElementById("date").value, price: pr})); //document.getElementById("new_price").value}));
 
-			var d = new Date(document.getElementById("date").value);
-			d.setHours(d.getHours() + 1);
+			//var d = new Date(document.getElementById("date").value);
+			//d.setHours(d.getHours() + 1);
 
-			var newNum = (Math.random() * 3.3) + 0.7;
-			newNum = Math.round(newNum * 100) / 100;
-			document.getElementById("new_price").value = newNum;
-			document.getElementById("date").value = d.toISOString().slice(0, 19);
+			//var newNum = (Math.random() * 3.3) + 0.7;
+			//newNum = Math.round(newNum * 100) / 100;
+			//document.getElementById("new_price").value = newNum;
+			//document.getElementById("date").value = d.toISOString().slice(0, 10);
 		}
 	}
 
 	updateFlatRate1(event) {
 	    console.log("after click update");
-		console.log($("#r0").val());
+		console.log($("#rr0").val());
 		event.preventDefault()
 
-		socket.send(JSON.stringify({type: "flatRate", r1: $("#rr0").val(), r2:$("#rr1").val(), r3:$("#rr2").val()
+		socket.send(JSON.stringify({type: "flatRate", rF:$("#rrF").val(), r1: $("#rr0").val(), r2:$("#rr1").val(), r3:$("#rr2").val()
                                            , r4: $("#rr3").val(), r5:$("#rr4").val(), r6:$("#rr5").val(), r7:$("#rr6").val()}));
 		
 		var update = {}
@@ -331,7 +364,7 @@ export default class HomePage extends React.Component {
 		console.log($("#r0").val());
 		event.preventDefault()
 
-		socket.send(JSON.stringify({type: "flatRate", r1: $("#r0").val(), r2:$("#r1").val(), r3:$("#r2").val()}));
+		socket.send(JSON.stringify({type: "flatRate", r1: $("#r0").val(), r2:$("#r1").val(), r3:$("#r2").val(), rF:$("#rF").val()}));
 		
 		var update = {}
 		update['price_flat_0_to_150'] = $("#r0").val()
@@ -423,27 +456,148 @@ export default class HomePage extends React.Component {
 					&nbsp;
 					<div onClick={this.changeDRMode.bind(this, "0")} className="btn btn-success">Normal</div>
 				</form>
-				<br/>
+
+                                <hr	style={{
+					color: "#FF0000",
+					backgroundColor: "#FF0000",
+					height: 2
+				}} />
 				
-				<h1>Broadcast Realtime Price</h1>
+				<h1>Float Time (FT) & VAT</h1>
+				<br/>
+
+				<form className="form-inline">
+					<div className="form-group">
+						<label htmlFor="FT_Value">FT :</label>&nbsp;
+						<input className="form-control" type="number" defaultValue={0.52} id="FT_Value" name="FT_Value"/>
+					</div>
+					<br/>
+					<div className="form-group">
+						<label htmlFor="VAT_Value">VAT :</label>&nbsp;
+						<input className="form-control" type="number" defaultValue={7.0} id="VAT_Value" name="VAT_Value"/>&nbsp;
+						<label htmlFor="VAT_Value_end"> % </label>
+					</div>
+					<div><br/></div>
+					<input className="btn btn-default" type="submit" onClick={this.broadcastFV.bind(this)} name="submitFV" value="Update"/>
+				</form>
+
+                                <hr	style={{
+					color: "#000000",
+					backgroundColor: "#000000",
+					height: 1
+				}} />
+				
+				<h1>24 Hours Realtime Price</h1>
 				<br/>
 				
 				<form className="form-inline">
 					<div className="form-group">
 						<label htmlFor="date">Date</label>&nbsp;
-						<input className="form-control" type="datetime-local" defaultValue={d.toISOString().slice(0, 19)} id="date" name="date"/>
+                                                
+						<input className="form-control" type="date" defaultValue={d.toISOString().slice(0, 19)} id="date" name="date"/>
 					</div>
-					&nbsp;
+					<div><br/></div>
+					<table className="table table-bordered">
+						<thead>
+							<tr>
+								<th>Time</th>
+								<th>Price</th>
+								<th>Time</th>
+								<th>Price</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<th scope="row">12:00 AM</th>
+								<td><input id="rtp0" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">12:00 PM</th>
+								<td><input id="rtp12" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">01:00 AM</th>
+								<td><input id="rtp1" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">01:00 PM</th>
+								<td><input id="rtp13" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">02:00 AM</th>
+								<td><input id="rtp2" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">02:00 PM</th>
+								<td><input id="rtp14" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">03:00 AM</th>
+								<td><input id="rtp3" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">03:00 PM</th>
+								<td><input id="rtp15" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">04:00 AM</th>
+								<td><input id="rtp4" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">04:00 PM</th>
+								<td><input id="rtp16" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">05:00 AM</th>
+								<td><input id="rtp5" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">05:00 PM</th>
+								<td><input id="rtp17" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">06:00 AM</th>
+								<td><input id="rtp6" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">06:00 PM</th>
+								<td><input id="rtp18" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">07:00 AM</th>
+								<td><input id="rtp7" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">07:00 PM</th>
+								<td><input id="rtp19" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">08:00 AM</th>
+								<td><input id="rtp8" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">08:00 PM</th>
+								<td><input id="rtp20" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">09:00 AM</th>
+								<td><input id="rtp9" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">09:00 PM</th>
+								<td><input id="rtp21" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">10:00 AM</th>
+								<td><input id="rtp10" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">10:00 PM</th>
+								<td><input id="rtp22" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+							<tr>
+								<th scope="row">11:00 AM</th>
+								<td><input id="rtp11" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+								<th scope="row">11:00 PM</th>
+								<td><input id="rtp23" type="number" defaultValue={2.5} step="any" required/> Bahts/Unit</td>
+							</tr>
+						</tbody>
+					</table>
+					<br/>
 					<div className="form-group">
-						<label htmlFor="new_price">New price</label>&nbsp;
-						<input className="form-control" type="number" defaultValue="1.5" id="new_price" name="new_price" placeholder="New Price"/>
+						<label htmlFor="realtime_fee">Service Fee :</label>&nbsp;
+						<input id="rtpF" type="number" defaultValue={55.5} step="any" required/>&nbsp;
+						<label htmlFor="realtime_fee_after"> Bahts/Month</label>
 					</div>
-					&nbsp;
-					<input className="btn btn-default" type="submit" onClick={this.broadcastPrice.bind(this)} name="submit" value="Submit"/>
+					<div><br/></div>
+					<input className="btn btn-default" type="submit" onClick={this.broadcastPrice.bind(this)} name="submit" value="Update"/>
 				</form>
-				
-				<br/>
-				<h1>Update Flat Rate Price</h1>
+
+                                <hr	style={{
+					color: "#000000",
+					backgroundColor: "#000000",
+					height: 1
+				}} />
+
+				<h1>Flat Rate Price</h1>
 				<br/>
                                 <Tabs>
                                     <TabList>
@@ -463,34 +617,41 @@ export default class HomePage extends React.Component {
 					<tbody>
 						<tr>
 							<th scope="row">0-15</th>
-							<td><input id="rr0" type="number" step="any" required/></td>
+							<td><input id="rr0" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 						<tr>
 							<th scope="row">16-25</th>
-							<td><input id="rr1" type="number" step="any" required/></td>
+							<td><input id="rr1" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 						<tr>
 							<th scope="row">26-35</th>
-							<td><input id="rr2" type="number" step="any" required/></td>
+							<td><input id="rr2" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 						<tr>
 							<th scope="row">36-100</th>
-							<td><input id="rr3" type="number" step="any" required/></td>
+							<td><input id="rr3" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 						<tr>
 							<th scope="row">101-150</th>
-							<td><input id="rr4" type="number" step="any" required/></td>
+							<td><input id="rr4" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 						<tr>
 							<th scope="row">151-400</th>
-							<td><input id="rr5" type="number" step="any" required/></td>
+							<td><input id="rr5" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 						<tr>
 							<th scope="row">400+</th>
-							<td><input id="rr6" type="number" step="any" required/></td>
+							<td><input id="rr6" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 					</tbody>
 				</table>
+				<br/>
+				<div className="form-group">
+					<label htmlFor="rr_fee">Service Fee :</label>&nbsp;
+					<input id="rrF" type="number" step="any" required/>&nbsp;
+					<label htmlFor="rr_fee_after"> Bahts/Month</label>
+				</div>
+				<br/>
 				<input className="btn btn-default" type="submit" name="submit" value="Update"/>
 				</form>
                                 </TabPanel>
@@ -507,32 +668,43 @@ export default class HomePage extends React.Component {
 					<tbody>
 						<tr>
 							<th scope="row">0-150</th>
-							<td><input id="r0" type="number" step="any" required/></td>
+							<td><input id="r0" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 						<tr>
 							<th scope="row">151-400</th>
-							<td><input id="r1" type="number" step="any" required/></td>
+							<td><input id="r1" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 						<tr>
 							<th scope="row">400+</th>
-							<td><input id="r2" type="number" step="any" required/></td>
+							<td><input id="r2" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 					</tbody>
 				</table>
+				<br/>
+				<div className="form-group">
+					<label htmlFor="r_fee">Service Fee :</label>&nbsp;
+					<input id="rF" type="number" step="any" required/>&nbsp;
+					<label htmlFor="r_fee_after"> Bahts/Month</label>
+				</div>
+				<br/>
 				<input className="btn btn-default" type="submit" name="submit" value="Update"/>
 				</form>
                                 </TabPanel>
                                 </Tabs>
-				
-				<br/>
-				<h1>Update TOU Price</h1>
+
+                                <hr	style={{
+					color: "#000000",
+					backgroundColor: "#000000",
+					height: 1
+				}} />
+
+				<h1>TOU Price</h1>
 				<br/>
 				<form onSubmit={this.updateTOU}>
 				<table className="table table-bordered">
 					<thead>
 						<tr>
 							<th colSpan="2">Price</th>
-							<th rowSpan="2">Monthly Fee</th>
 						</tr>
 						<tr>
 							<th>Peak</th>
@@ -541,17 +713,27 @@ export default class HomePage extends React.Component {
 					</thead>
 					<tbody>
 						<tr>
-							<td><input id="peak" type="number" step="any" required/></td>
-							<td><input id="offPeak" type="number" step="any" required/></td>
-							<td><input id="monthly" type="number" step="any" required/></td>
+							<td><input id="peak" type="number" step="any" required/> Bahts/Unit</td>
+							<td><input id="offPeak" type="number" step="any" required/> Bahts/Unit</td>
 						</tr>
 					</tbody>
 				</table>
+				<br/>
+				<div className="form-group">
+					<label htmlFor="monthly_fee">Service Fee :</label>&nbsp;
+					<input id="monthly" type="number" step="any" required/>&nbsp;
+					<label htmlFor="monthly_after"> Bahts/Month</label>
+				</div>
+				<br/>
 				<input className="btn btn-default" type="submit" name="submit" value="Update"/>
 				</form>
 				
 				<br/>
-				<br/>
+                                <hr	style={{
+					color: "#FF0000",
+					backgroundColor: "#FF0000",
+					height: 2
+				}} />
 				
 				<h1>Rules</h1>
 				
@@ -668,11 +850,15 @@ export default class HomePage extends React.Component {
 									<option value="time">Time</option>
 									<option value="mode">Mode</option>
 									<option value="drmode">DR Mode</option>
+									<option value="pricing">Pricing</option>
 								</select>
 							</div>
 							<div className="form-group condition conditionTime">
 								<label>Start Time</label>
 								<input type="time" className="form-control" id="conditionStartTime"/>
+							</div>
+							<div className="form-group condition conditionPricing">
+								<label>Pricing</label>
 							</div>
 							<div className="form-group condition conditionTime">
 								<label>End Time</label>
@@ -707,7 +893,7 @@ export default class HomePage extends React.Component {
 									): null}
 								</select>
 							</div>
-							<div className="form-group condition conditionApp conditionSensor">
+							<div className="form-group condition conditionPricing conditionApp conditionSensor">
 								<label>Operator</label>
 								<select className="form-control" id="conditionOperator">
 									<option disabled selected value> -- select an option -- </option>
@@ -719,7 +905,7 @@ export default class HomePage extends React.Component {
 									<option value="le">&lt;=</option>
 								</select>
 							</div>
-							<div className="form-group condition conditionApp conditionSensor">
+							<div className="form-group condition conditionPricing conditionApp conditionSensor">
 								<label>Value</label>
 								<input type="text" className="form-control" id="conditionValue" placeholder="Value"/>
 							</div>
@@ -777,6 +963,9 @@ export default class HomePage extends React.Component {
 		}
 		else if($("#conditionType").val() == "drmode") {
 			$(".conditionDRmode").show()
+		}
+		else if($("#conditionType").val() == "pricing") {
+			$(".conditionPricing").show()
 		}
 	}
 	
@@ -841,6 +1030,18 @@ export default class HomePage extends React.Component {
 			} else {
 				alert("Please fill in all fields")
 			}
+		} else if(type == "pricing") {
+			var operator = $("#conditionOperator").val()
+			var value = $("#conditionValue").val()
+			
+			if(operator && value) {
+				this.addCondition.push({type: type, operator: operator, value: value})
+				$("#addConditionModal").modal("hide")
+				this.clearForm()
+			} else {
+				alert("Please fill in all fields")
+			}
+
 		} else if(type == "sensor") {
 			
 		} else if(type == "time") {
@@ -1017,6 +1218,10 @@ export default class HomePage extends React.Component {
 		} else if(condition.type == "drmode") {
 			return (
 				<li style={{height: "25px"}} key={i}><b>DR Mode</b> is <b>{condition.value == 0 ? "Normal" : (condition.value == 1 ? "Savings" : "Extreme Savings")}</b> <button type="button" className="close" style={{color: "black", marginTop: "3px"}}><span onClick={this.removeAddCondition.bind(this, i)}>&times;</span></button></li>
+			)
+		} else if(condition.type == "pricing") {
+			return (
+				<li style={{height: "25px"}} key={i}>Pricing {this.renderOperator(condition.operator)} {condition.value} <button type="button" className="close" style={{color: "black", marginTop: "3px"}}><span onClick={this.removeAddCondition.bind(this, i)}>&times;</span></button></li>
 			)
 		} else {
 			return null
