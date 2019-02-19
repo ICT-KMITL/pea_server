@@ -93,19 +93,19 @@ class RuleCard extends React.Component {
 	
 	deleteRule() {
 		if(confirm("Are you sure you want to delete this rule?")) {
-			socket.send(JSON.stringify({type: "delete", id: this.house, url: '/api/rules/'+this.props.rule.id+'/'}));
+			socket.send(JSON.stringify({type: "delete", id: this.props.rulespage.house, url: '/api/rules/'+this.props.rule.id+'/'}));
 			
 			var newData = []
 			
-			this.houseData.rules.forEach((rule) => {
+			this.props.rulespage.houseData.rules.forEach((rule) => {
 				if(rule.id != this.props.rule.id) {
 					newData.push(rule)
 				}
 			})
 			
-			this.houseData.rules = newData
+			this.props.rulespage.houseData.rules = newData
 			
-			put('/api/households/'+this.house+'/?format=json', this.houseData)
+			put('/api/households/'+this.props.rulespage.house+'/?format=json', this.props.rulespage.houseData)
 			.then(action("Update Rule Fulfilled", (res) => {
 				this.edit = false
 				$("#addRuleModal").modal("hide")
@@ -121,24 +121,30 @@ class RuleCard extends React.Component {
 	}
 
 	activeRule() {
-                var data = {params: { format: 'json', active: 1	}}
+        var data = {params: { format: 'json', active: 1	}}
 		if(confirm("Are you sure you want to active this rule?")) {
-                        socket.send(JSON.stringify({type: "post", id: this.house, url: '/api/rules/'+this.props.rule.id+'/active/'}));
+                        socket.send(JSON.stringify({type: "post", id: this.props.rulespage.house, url: '/api/rules/'+this.props.rule.id+'/active/', data: data}));
 
 			var newData = []
 			
-			this.houseData.rules.forEach((rule) => {
+			console.log("houseData")
+			//console.log(this.props.houseData)
+			console.log(this.props.rulespage.houseData.rules)
+			//console.log(this.houseData)
+			console.log(this.props.rule)
+			
+			this.props.rulespage.houseData.rules.forEach((rule) => {
 				if(rule.id != this.props.rule.id) {
 					newData.push(rule)
 				} else {
-                                        rule.active = 1
+                    rule.active = 1
 					newData.push(rule)
-                                }
+                    }
 			})
 
-			this.houseData.rules = newData
+			this.props.rulespage.houseData.rules = newData
 
-			put('/api/households/'+this.house+'/?format=json', this.houseData)
+			put('/api/households/'+this.props.rulespage.house+'/?format=json', this.props.rulespage.houseData)
 			.then(action("Update Rule Fulfilled", (res) => {
 				this.edit = false
 				$("#addRuleModal").modal("hide")
@@ -155,24 +161,30 @@ class RuleCard extends React.Component {
 	}
 
 	deactiveRule() {
-                var data = {params: { format: 'json', active: 0	}}
+        var data = {params: { format: 'json', active: 0	}}
 		if(confirm("Are you sure you want to de-active this rule?")) {
-                        socket.send(JSON.stringify({type: "post", id: this.house, url: '/api/rules/'+this.props.rule.id+'/active/'}));
+                        socket.send(JSON.stringify({type: "post", id: this.props.rulespage.house, url: '/api/rules/'+this.props.rule.id+'/active/', data: data}));
 
 			var newData = []
 			
-			this.houseData.rules.forEach((rule) => {
+			console.log("houseData")
+			//console.log(this.props.houseData)
+			console.log(this.props.rulespage.houseData.rules)
+			//console.log(this.houseData)
+			console.log(this.props.rule)
+			
+			this.props.rulespage.houseData.rules.forEach((rule) => {
 				if(rule.id != this.props.rule.id) {
 					newData.push(rule)
 				} else {
-                                        rule.active = 0
+                    rule.active = 0
 					newData.push(rule)
-                                }
+                    }
 			})
 
-			this.houseData.rules = newData
+			this.props.rulespage.houseData.rules = newData
 
-			put('/api/households/'+this.house+'/?format=json', this.houseData)
+			put('/api/households/'+this.props.rulespage.house+'/?format=json', this.props.rulespage.houseData)
 			.then(action("Update Rule Fulfilled", (res) => {
 				this.edit = false
 				$("#addRuleModal").modal("hide")
